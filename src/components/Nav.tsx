@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "@/app/auth/actions";
 
 const links = [
   { href: "/", label: "Today" },
@@ -9,7 +10,7 @@ const links = [
   { href: "/stats", label: "Stats" },
 ] as const;
 
-export default function Nav() {
+export default function Nav({ userEmail }: { userEmail: string | null }) {
   const pathname = usePathname();
 
   return (
@@ -35,6 +36,22 @@ export default function Nav() {
             </Link>
           );
         })}
+
+        <div className="ml-auto flex items-center gap-3">
+          {userEmail && (
+            <span className="text-muted text-xs hidden sm:block truncate max-w-[160px]">
+              {userEmail}
+            </span>
+          )}
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="px-3 py-1.5 rounded-lg text-sm font-medium text-muted hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
       </nav>
     </header>
   );

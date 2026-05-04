@@ -10,7 +10,7 @@ Built with **Next.js 16** + **React 19** + **Supabase** + **Tailwind v4**. Scaff
 - **History** — full log, grouped by date, newest first
 - **Stats** — totals, daily averages, and a 7-day calorie bar chart
 - Dark mode via `prefers-color-scheme`, mobile-first responsive UI
-- No auth — single-user personal app (see _Security note_ below)
+- Magic-link auth via Supabase — no password, just email (see _Authentication_ below)
 
 ## Stack
 
@@ -80,17 +80,33 @@ supabase/
 └── schema.sql             CREATE TABLE + RLS policies
 ```
 
+## Authentication
+
+This app uses **Supabase magic-link (OTP) auth**. On first visit you are redirected to `/login`, enter your email, and receive a one-click sign-in link. No password required.
+
+### Magic-link flow
+
+1. User submits email on `/login` → server action calls `supabase.auth.signInWithOtp()`.
+2. Supabase emails a link to `<your-url>/auth/callback?code=…`.
+3. The callback route calls `exchangeCodeForSession(code)` and sets a secure session cookie.
+4. Middleware (`src/middleware.ts`) runs on every request, refreshes the session cookie via `getUser()`, and redirects unauthenticated visitors to `/login`.
+
+### Supabase dashboard configuration
+
+Before deploying, open your Supabase project and configure:
+
+| Location | Setting | Value |
+|---|---|---|
+| Authentication → URL Configuration | Site URL | Your Vercel deployment URL (e.g. `https://meal-tracker-xyz.vercel.app`) |
+| Authentication → URL Configuration | Redirect URLs | Add `https://meal-tracker-xyz.vercel.app/auth/callback` |
+| Authentication → Providers → Email | Enable email provider | On (default) |
+| Authentication → Providers → Email | Confirm email | Off — magic links don't need a separate confirm step |
+
+For local dev, Supabase automatically allows `http://localhost:3000/auth/callback`.
+
 ## Security note
 
-This is a **single-user** app. Row-level security is enabled but policies allow the anon key to read/write all rows. That means **anyone with your deployed URL could view and modify your meals** if they inspect the client-side requests and learn the anon key.
-
-For personal use on a URL you don't publicize, this is fine. If you want real multi-user protection:
-
-1. Enable Supabase Auth (email magic links are one-click)
-2. Add a `user_id uuid references auth.users` column to `meals`
-3. Replace the `using (true)` policy with `using (auth.uid() = user_id)`
-4. Add a `src/middleware.ts` using `@supabase/ssr` to refresh sessions
-5. Add a login page
+Auth is enabled. Row-level security policies enforce that each user can only read and write their own meals (`auth.uid() = user_id`). The anon key alone cannot access any meal data.
 
 ## License
 
