@@ -27,6 +27,33 @@ export default async function Home() {
     <div className="flex flex-col gap-6">
       <MealForm />
 
+      <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-xl p-4 flex flex-wrap gap-4">
+        <div className="flex flex-col">
+          <span className="text-xs text-muted uppercase tracking-wide font-medium">
+            Calories
+          </span>
+          <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
+            {totalCalories.toLocaleString()}
+          </span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-xs text-muted uppercase tracking-wide font-medium">
+            Protein
+          </span>
+          <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
+            {Math.round(totalProtein * 10) / 10}g
+          </span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-xs text-muted uppercase tracking-wide font-medium">
+            Meals
+          </span>
+          <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
+            {meals.length}
+          </span>
+        </div>
+      </div>
+
       {meals.length === 0 ? (
         <div className="text-center py-12 text-muted">
           <p className="text-lg">No meals logged today</p>
@@ -34,33 +61,6 @@ export default async function Home() {
         </div>
       ) : (
         <>
-          <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-xl p-4 flex flex-wrap gap-4">
-            <div className="flex flex-col">
-              <span className="text-xs text-muted uppercase tracking-wide font-medium">
-                Calories
-              </span>
-              <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
-                {totalCalories.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs text-muted uppercase tracking-wide font-medium">
-                Protein
-              </span>
-              <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
-                {Math.round(totalProtein * 10) / 10}g
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs text-muted uppercase tracking-wide font-medium">
-                Meals
-              </span>
-              <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
-                {meals.length}
-              </span>
-            </div>
-          </div>
-
           {MEAL_TYPES.filter((type) => grouped[type].length > 0).map((type) => (
             <section key={type} className="flex flex-col gap-3">
               <h2 className="text-sm font-semibold text-muted uppercase tracking-wide">
