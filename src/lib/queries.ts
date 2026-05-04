@@ -31,6 +31,11 @@ function isoDate(d: Date): string {
 export async function getTodayMeals(): Promise<Meal[]> {
   try {
     const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return [];
+
     const start = startOfLocalDay(new Date());
     const end = new Date(start);
     end.setDate(end.getDate() + 1);
@@ -56,6 +61,11 @@ export async function getTodayMeals(): Promise<Meal[]> {
 export async function getAllMeals(): Promise<Meal[]> {
   try {
     const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return [];
+
     const { data, error } = await supabase
       .from("meals")
       .select("*")
@@ -100,6 +110,11 @@ function emptyStats(): Stats {
 export async function getStats(): Promise<Stats> {
   try {
     const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return emptyStats();
+
     const today = startOfLocalDay(new Date());
     const weekStart = new Date(today);
     weekStart.setDate(weekStart.getDate() - 6);

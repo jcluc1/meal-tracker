@@ -76,7 +76,16 @@ export async function addMeal(formData: FormData): Promise<ActionResult> {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.from("meals").insert(parsed);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: "Not signed in." };
+  }
+
+  const { error } = await supabase
+    .from("meals")
+    .insert({ ...parsed, user_id: user.id });
 
   if (error) {
     console.error("addMeal failed", error);
